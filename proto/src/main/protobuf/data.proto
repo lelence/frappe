@@ -1,0 +1,7 @@
+syntax = "proto3";
+
+option java_multiple_files = true;
+option java_package = "org.maogogo.frappe.protobuf";
+package com.maogogo.cocoa.protobuf;
+
+import "google/protobuf/wrappers.proto";

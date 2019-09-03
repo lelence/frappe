@@ -1,4 +1,4 @@
-const loadView = (name) => () => import('@/views/' + name)
+const loadView = (name) => () => import(`@/views/${name}/`)
 
 export {
     loadView

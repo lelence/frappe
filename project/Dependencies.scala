@@ -12,7 +12,7 @@ object Dependencies {
 
     val guiceVersion = "4.2.2"
 
-    lazy val testDependency = Seq(
+    lazy val testDeps = Seq(
       "org.scalatest" %% "scalatest" % scalaTestVersion,
       "com.typesafe.akka" %% "akka-testkit" % akkaVersion,
       "com.typesafe.akka" %% "akka-stream-testkit" % akkaVersion,
@@ -20,35 +20,34 @@ object Dependencies {
       "org.scalamock" %% "scalamock" % "4.4.0"
     ) map (_ % Test)
 
-    lazy val commonDependency = Seq(
-      "org.slf4j" % "slf4j-api" % slf4jVersion,
+    lazy val baseDeps = Seq(
+      // "org.slf4j" % "slf4j-api" % slf4jVersion,
+      "com.typesafe.akka" %% "akka-slf4j" % akkaVersion,
       "ch.qos.logback" % "logback-core" % logbackVersion,
       "ch.qos.logback" % "logback-classic" % logbackVersion,
       "com.typesafe.scala-logging" %% "scala-logging" % "3.9.2",
-
       "com.github.scopt" %% "scopt" % "3.7.1"
 
       //      "com.github.nscala-time" %% "nscala-time" % "2.20.0"
       //      "org.clapper" %% "classutil" % "1.4.0",
       //      "org.reflections" % "reflections" % "0.9.11",
       //      "org.bouncycastle" % "bcprov-jdk15on" % "1.60"
-
     )
 
-    lazy val json4sDependency = Seq(
+    lazy val json4sDeps = Seq(
       "com.thesamet.scalapb" %% "scalapb-json4s" % "0.9.3",
       "org.json4s" %% "json4s-native" % json4sVersion,
       "org.json4s" %% "json4s-jackson" % json4sVersion,
       "com.fasterxml.jackson.module" %% "jackson-module-scala" % "2.9.9"
     )
 
-    lazy val guiceDependency = Seq(
+    lazy val guiceDeps = Seq(
       "com.google.inject" % "guice" % guiceVersion,
       "com.google.inject.extensions" % "guice-assistedinject" % guiceVersion,
       "net.codingwell" %% "scala-guice" % "4.2.6"
     )
 
-    lazy val akkaDependency = Seq(
+    lazy val akkaDeps = Seq(
       "com.typesafe.akka" %% "akka-actor" % akkaVersion,
       "com.typesafe.akka" %% "akka-slf4j" % akkaVersion,
       "com.typesafe.akka" %% "akka-remote" % akkaVersion,
@@ -60,7 +59,7 @@ object Dependencies {
       "com.typesafe.akka" %% "akka-slf4j" % akkaVersion
     )
 
-    lazy val httpDependency = Seq(
+    lazy val httpDeps = Seq(
       "com.typesafe.akka" %% "akka-http" % "10.1.9",
       "de.heikoseeberger" %% "akka-http-json4s" % "1.22.0"
     )
@@ -69,7 +68,7 @@ object Dependencies {
     //
     //  )
 
-    lazy val driverDependency = Seq(
+    lazy val driverDeps = Seq(
       "com.github.etaty" %% "rediscala" % "1.9.0",
       "com.lightbend.akka" %% "akka-stream-alpakka-slick" % "1.1.1",
       "com.typesafe.akka" %% "akka-stream-kafka" % "1.0.5",
@@ -84,13 +83,12 @@ object Dependencies {
     "com.thesamet.scalapb" %% "scalapb-runtime" % scalapb.compiler.Version.scalapbVersion % "protobuf"
   )
 
-
   import Internal._
 
-  lazy val dependency4Common = commonDependency ++ guiceDependency ++ akkaDependency ++ driverDependency ++ testDependency
+  lazy val commonDeps = baseDeps ++ guiceDeps ++ akkaDeps ++ driverDeps ++ testDeps
 
-  lazy val dependency4Rest = dependency4Common ++ httpDependency ++ json4sDependency
+  lazy val restDeps = commonDeps ++ httpDeps ++ json4sDeps
 
-  lazy val dependency4Rpc = dependency4Common ++ httpDependency ++ json4sDependency
+  lazy val rpcDeps = commonDeps ++ httpDeps ++ json4sDeps
 
 }

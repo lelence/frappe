@@ -22,9 +22,9 @@ import akka.http.scaladsl.Http
 import akka.stream.ActorMaterializer
 import com.google.inject.Inject
 
-class HttpServer @Inject() (route: RouteEndpoints)(implicit
-  system: ActorSystem,
-  mat: ActorMaterializer) {
+class HttpServer @Inject()(route: RouteEndpoints)(implicit
+                                                  system: ActorSystem,
+                                                  mat: ActorMaterializer) {
 
   val logger = Logging(system, getClass)
 

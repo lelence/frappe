@@ -18,7 +18,7 @@ package org.maogogo.frappe.common.modules
 
 import akka.actor.ActorSystem
 import akka.stream.ActorMaterializer
-import com.google.inject.{ AbstractModule, Inject, Provider }
+import com.google.inject.{AbstractModule, Inject, Provider}
 import com.typesafe.config.Config
 import net.codingwell.scalaguice.ScalaModule
 
@@ -35,7 +35,9 @@ sealed trait SysAndConfigModule {
         bind[Config].toInstance(config)
 
         // bind[ActorBuilder].annotatedWithName("actor_builder").to[ActorBuilderImpl]
-        bind[ActorMaterializer].toProvider[ActorMaterializerProvider].asEagerSingleton()
+        bind[ActorMaterializer]
+          .toProvider[ActorMaterializerProvider]
+          .asEagerSingleton()
       }
     }
 }
@@ -44,7 +46,8 @@ object SysAndConfigModule extends SysAndConfigModule {
 
   lazy val AkkaSystemName = "MyClusterSystem"
 
-  class ActorMaterializerProvider @Inject() (system: ActorSystem) extends Provider[ActorMaterializer] {
+  class ActorMaterializerProvider @Inject()(system: ActorSystem)
+      extends Provider[ActorMaterializer] {
     override def get(): ActorMaterializer = ActorMaterializer()(system)
   }
 

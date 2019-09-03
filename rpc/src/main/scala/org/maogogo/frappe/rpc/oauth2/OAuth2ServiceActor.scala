@@ -14,11 +14,13 @@
  * limitations under the License.
  */
 
-package org.maogogo.frappe
+package org.maogogo.frappe.rpc.oauth2
 
-package object common {
+import akka.actor.Actor
 
-  type ProtoBuf[T] = scalapb.GeneratedMessage with scalapb.Message[T]
+class OAuth2ServiceActor extends Actor {
+  override def receive: Receive = {
+    case s: String ⇒
 
-  case class AppSetting(port: Int = 2552, seeds: Seq[String] = Seq.empty)
+  }
 }

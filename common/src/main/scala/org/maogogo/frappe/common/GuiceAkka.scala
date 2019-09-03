@@ -16,9 +16,12 @@
 
 package org.maogogo.frappe.common
 
-import com.google.inject.{ Guice, Injector, Module }
-import com.typesafe.config.{ Config, ConfigFactory }
-import org.maogogo.frappe.common.modules.SysAndConfigModule
+import com.google.inject.{Guice, Injector, Module}
+import com.typesafe.config.{Config, ConfigFactory}
+import org.maogogo.frappe.common.modules.{
+  SingletonClusterModule,
+  SysAndConfigModule
+}
 
 final object GuiceAkka {
 
@@ -35,13 +38,17 @@ private[common] class GuiceAkka(config: Config, modules: Seq[Module]) {
   def system(cfg: Config, m: Module*): GuiceAkka =
     new GuiceAkka(cfg, modules ++ m)
 
-  //  def cluster(): GuiceAkka = new GuiceAkka(cfg, modules :+ ClusterSystemModule())
-  //
-  //  def cluster(cfg: Config) = new GuiceAkka(cfg, ms :+ ClusterSystemModule())
-  //
-  //  def cluster(m: Module*) = new GuiceAkka(cfg, ms ++ m :+ ClusterSystemModule())
-  //
-  //  def cluster(cfg: Config, m: Module*) = new GuiceAkka(cfg, ms ++ m :+ ClusterSystemModule())
+  def cluster(): GuiceAkka =
+    new GuiceAkka(config, modules :+ SingletonClusterModule())
+
+  def cluster(cfg: Config): GuiceAkka =
+    new GuiceAkka(cfg, modules :+ SingletonClusterModule())
+
+  def cluster(m: Module*): GuiceAkka =
+    new GuiceAkka(config, modules ++ m :+ SingletonClusterModule())
+
+  def cluster(cfg: Config, m: Module*): GuiceAkka =
+    new GuiceAkka(cfg, modules ++ m :+ SingletonClusterModule())
 
   def build(): Injector =
     Guice.createInjector(modules :+ SysAndConfigModule(config): _*)

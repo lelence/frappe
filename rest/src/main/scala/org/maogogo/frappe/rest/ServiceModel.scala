@@ -18,7 +18,7 @@ package org.maogogo.frappe.rest
 
 import com.google.inject.AbstractModule
 import net.codingwell.scalaguice.ScalaModule
-import org.maogogo.frappe.rest.httpd.{ HttpServer, RouteEndpoints }
+import org.maogogo.frappe.rest.httpd.{HttpServer, RouteEndpoints}
 
 class ServiceModel extends AbstractModule with ScalaModule {
 

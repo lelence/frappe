@@ -14,11 +14,11 @@
  * limitations under the License.
  */
 
-package org.maogogo.frappe
+package org.maogogo.frappe.rest.httpd
 
-package object common {
+trait Json4sSupport extends de.heikoseeberger.akkahttpjson4s.Json4sSupport {
 
-  type ProtoBuf[T] = scalapb.GeneratedMessage with scalapb.Message[T]
+  implicit val serialization = org.json4s.native.Serialization
+  implicit val formats = org.json4s.DefaultFormats
 
-  case class AppSetting(port: Int = 2552, seeds: Seq[String] = Seq.empty)
 }

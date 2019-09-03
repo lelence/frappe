@@ -18,25 +18,28 @@ package org.maogogo.frappe.common.modules
 
 import akka.actor.ActorSystem
 import akka.cluster.Cluster
-import com.google.inject.{ AbstractModule, Inject, Provider }
+import com.google.inject.{AbstractModule, Inject, Provider}
 import net.codingwell.scalaguice.ScalaModule
+import org.maogogo.frappe.common.cluster.SimpleClusterListener
 
 sealed trait SingletonClusterModule {
 
   def apply(): AbstractModule with ScalaModule =
     new AbstractModule with ScalaModule {
       override def configure(): Unit = {
-        bind[Cluster].toProvider[SingletonClusterModule.ClusterProvider].asEagerSingleton()
-        // bind[SimpleClusterListener]
+        bind[Cluster]
+          .toProvider[SingletonClusterModule.ClusterProvider]
+          .asEagerSingleton()
+        bind[SimpleClusterListener]
       }
     }
 }
 
 object SingletonClusterModule extends SingletonClusterModule {
 
-  class ClusterProvider @Inject() (system: ActorSystem) extends Provider[Cluster] {
+  class ClusterProvider @Inject()(system: ActorSystem)
+      extends Provider[Cluster] {
     override def get(): Cluster = Cluster(system)
   }
 
 }
-

@@ -15,10 +15,62 @@
  */
 
 package org.maogogo.frappe.rpc
-import java.io.File
+
+import com.typesafe.config.ConfigFactory
+import org.maogogo.frappe.common.{ AppSetting, GuiceAkka }
 
 object Main extends App {
 
-  val ss = Seq()
+  //  import org.maogogo.frappe.co
 
+  new scopt.OptionParser[AppSetting]("scopt") {
+    head("latte", "1.0")
+
+    opt[Int]('p', "port")
+      .action((x, c) ⇒ {
+        c.copy(port = x)
+      })
+      .text("tcp port")
+
+    opt[Seq[String]]('s', "seeds")
+      .action((x, c) ⇒ {
+        c.copy(seeds = x)
+      })
+      .text("cluster seeds")
+
+  }.parse(args, AppSetting()) match {
+    case Some(settings) ⇒
+      //      val seeds = settings.seeds
+      //        .map(s ⇒ s""""akka.tcp://${SysAndConfigModule.SystemName}@${s.trim}"""")
+      //        .mkString(",")
+
+      //      val config = ConfigFactory
+      //        .parseString(s"""
+      //             |akka.remote.netty.tcp.port=${settings.port}
+      //             |akka.remote.netty.tcp.hostname="127.0.0.1"
+      //             |akka.cluster.seed-nodes=[${seeds}]
+      //        """.stripMargin)
+      //        .withFallback(ConfigFactory.load())
+
+      val injector =
+        GuiceAkka().cluster(ConfigFactory.load(), ServiceModel).build()
+      //
+      //      import net.codingwell.scalaguice.InjectorExtensions._
+      //
+      //      injector.instance[ActorRef](Names.named("hello_actor"))
+
+      println(logo)
+
+    case _ ⇒
+  }
+
+  lazy val logo =
+    """
+      |    ____
+      |   / __ \____  _____
+      |  / /_/ / __ \/ ___/
+      | / _, _/ /_/ / /__
+      |/_/ |_/ .___/\___/
+      |     /_/
+    """.stripMargin
 }

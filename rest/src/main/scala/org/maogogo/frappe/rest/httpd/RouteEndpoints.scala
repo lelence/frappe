@@ -16,35 +16,76 @@
 
 package org.maogogo.frappe.rest.httpd
 
-import akka.actor.ActorSystem
+import akka.actor.{ActorRef, ActorSystem}
 import akka.event.Logging
-import akka.http.scaladsl.model.HttpResponse
-import akka.http.scaladsl.server.{ RejectionHandler, Route }
-import com.google.inject.Inject
+import akka.http.scaladsl.model.{
+  HttpEntity,
+  HttpRequest,
+  HttpResponse,
+  RequestEntity,
+  ResponseEntity
+}
 import akka.http.scaladsl.server.Directives._
+import akka.http.scaladsl.server.Route
+import akka.stream.scaladsl.{Flow, Sink, Source}
+import akka.util.{ByteString, Timeout}
+import com.google.inject.Inject
+import akka.pattern.{ask, pipe}
+import org.maogogo.frappe.oauth2.OAuth2
+import org.maogogo.frappe.protobuf.oauth2.UserInfo
+import org.maogogo.frappe.rest.oauth2.OAuth2DataHandler
 
-class RouteEndpoints @Inject() (implicit system: ActorSystem) {
+import scala.concurrent.duration._
+import scala.reflect.ClassTag
+
+class RouteEndpoints @Inject()(implicit system: ActorSystem)
+    extends Json4sSupport
+    with OAuth2 {
+
+  import system.dispatcher
+
+  implicit val timeout = Timeout(5 seconds)
 
   private val logger = Logging(system, getClass)
 
-  //  val dd = RejectionHandler.newBuilder().handle {
-  ////    case
+  //  def actorService[T: ClassTag](actor: ActorRef, command: Any): Route = {
+  //
+  //    val f = (actor ? command).mapTo[T].map(WrappedResponse(200, _))
+  //
+  //    complete(f)
   //  }
 
-  def wrappedResponse(response: HttpResponse): HttpResponse = {
-    println(response.entity)
-    response.copy(entity = "hello")
-  }
+  implicit val dataHandler = new OAuth2DataHandler()
 
   def apply(): Route = {
 
-    mapResponse(wrappedResponse)(
-      // handleRejections()
-      pathEndOrSingleSlash {
-        get {
-          complete("ddd => heeheheh")
-        }
-      })
+    // https://www.jannikarndt.de/blog/2018/10/oauth2-akka-http/
+    // handleRejections()
+
+    // https://gitee.com/zifangsky/OAuth2.0Demo/blob/master/rbac_db.sql
+    // https://juejin.im/post/5b8cb6586fb9a01a133685c9
+    pathEndOrSingleSlash {
+      get {
+        complete(Seq("aa", "bb"))
+      }
+    } ~ path("auth") {
+      authenticateBasic(realm = "auth", basicAuthAuthenticator[UserInfo]) {
+        user =>
+          post {
+            println(user)
+            //          val loggedInUser = LoggedInUser(user)
+            //          loggedInUsers.append(loggedInUser)
+            complete("hello")
+          }
+      }
+    }
+    //    ~ path("api") {
+    //      authenticateOAuth2(realm = "api", oAuthAuthenticator) { validToken =>
+    //        complete(s"It worked! user = $validToken")
+    //      }
+    //    }
   }
 
 }
+
+//case class WrappedResponse[T](code: Int, data: T)

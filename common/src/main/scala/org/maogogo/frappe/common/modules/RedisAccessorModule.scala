@@ -16,10 +16,6 @@
 
 package org.maogogo.frappe.common.modules
 
-trait RedisAccessorModule {
+trait RedisAccessorModule {}
 
-}
-
-object RedisAccessorModule extends RedisAccessorModule {
-
-}
+object RedisAccessorModule extends RedisAccessorModule {}

@@ -5,15 +5,34 @@ object Settings {
 
   lazy val basicSetting = Seq(
     organization := "org.maogogo",
-    version := "0.0.1-SNAPSHOT",
+    version := sys.env.getOrElse("version", "0.0.1-SNAPSHOT"),
     scalaVersion := "2.12.7",
     organizationName := "Maogogo Workshop",
-    scalacOptions := Seq("-deprecation",
+    scalacOptions := Seq(
+      "-deprecation",
       "-feature",
       "-language:implicitConversions",
-      "-language:postfixOps"),
+      "-language:postfixOps"
+    ),
     startYear := Some(2019),
-    licenses += ("Apache-2.0", new URL("https://www.apache.org/licenses/LICENSE-2.0.txt"))
+    licenses += ("Apache-2.0", new URL(
+      "https://www.apache.org/licenses/LICENSE-2.0.txt"
+    ))
   )
+
+//  scalacOptions ++= Seq(
+//    "-unchecked",
+//    "-deprecation",
+//    "-feature",
+//    "-language:existentials",
+//    "-language:higherKinds",
+//    "-language:implicitConversions",
+//    "-language:postfixOps",
+//    "-Ywarn-dead-code",
+//    "-Ywarn-infer-any",
+//    "-Ywarn-unused-import",
+//    "-Xfatal-warnings",
+//    "-Xlint"
+//  ),
 
 }

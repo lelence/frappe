@@ -14,11 +14,14 @@
  * limitations under the License.
  */
 
-package org.maogogo.frappe
+package org.maogogo.frappe.rpc
 
-package object common {
+import akka.actor.Actor
 
-  type ProtoBuf[T] = scalapb.GeneratedMessage with scalapb.Message[T]
-
-  case class AppSetting(port: Int = 2552, seeds: Seq[String] = Seq.empty)
+class HelloActor extends Actor {
+  override def receive: Receive = {
+    case s: String ⇒
+      println("sss ==>>>" + s)
+      sender() ! "hahahahah"
+  }
 }

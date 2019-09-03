@@ -22,7 +22,8 @@ import org.maogogo.frappe.common.ProtoBuf
 class ProtoBufCacheAccesser[T <: ProtoBuf[T]](
   implicit
   val accessor: ReidsByteStringAccessor,
-  c: scalapb.GeneratedMessageCompanion[T]) extends Cacher[String, String, T, ByteString] {
+  c: scalapb.GeneratedMessageCompanion[T]
+) extends Cacher[String, String, T, ByteString] {
 
   override val keySerializer: KeySerializer[String, String] =
     new StringSerializer

@@ -14,11 +14,20 @@
  * limitations under the License.
  */
 
-package org.maogogo.frappe
+package org.maogogo.frappe.rpc
 
-package object common {
+import com.google.inject.AbstractModule
+import net.codingwell.scalaguice.ScalaModule
+import org.maogogo.frappe.common.modules.DatabaseModule
 
-  type ProtoBuf[T] = scalapb.GeneratedMessage with scalapb.Message[T]
+class ServiceModel extends AbstractModule with ScalaModule {
 
-  case class AppSetting(port: Int = 2552, seeds: Seq[String] = Seq.empty)
+  override def configure(): Unit = {
+
+    install(DatabaseModule())
+
+  }
+
 }
+
+object ServiceModel extends ServiceModel

@@ -22,23 +22,21 @@ import redis.RedisCommands
 import scala.concurrent.Future
 
 class ReidsByteStringAccessor(redis: RedisCommands)
-  extends Accessor[String, ByteString] {
+    extends Accessor[String, ByteString] {
 
   override def get(ks: String): Future[Option[ByteString]] = redis.get(ks)
 
-  override def put(
-    ks: String,
-    vs: ByteString,
-    ttl: Option[Long] = None): Future[Boolean] =
+  override def put(ks: String,
+                   vs: ByteString,
+                   ttl: Option[Long] = None): Future[Boolean] =
     redis.set(ks, vs, exSeconds = ttl)
 
   override def push(ks: String, vss: Seq[ByteString]): Future[Long] =
     redis.lpush(ks, vss: _*)
 
-  override def pull(
-    ks: String,
-    start: Long,
-    stop: Long): Future[Seq[ByteString]] =
+  override def pull(ks: String,
+                    start: Long,
+                    stop: Long): Future[Seq[ByteString]] =
     redis.lrange(ks, start, stop)
 
 }

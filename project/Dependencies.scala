@@ -7,6 +7,7 @@ object Dependencies {
     val slf4jVersion = "1.7.25"
     val logbackVersion = "1.2.3"
     val akkaVersion = "2.5.25"
+    val httpVersion = "10.1.10"
     val json4sVersion = "3.6.2"
     val scalaTestVersion = "3.0.8"
 
@@ -16,7 +17,7 @@ object Dependencies {
       "org.scalatest" %% "scalatest" % scalaTestVersion,
       "com.typesafe.akka" %% "akka-testkit" % akkaVersion,
       "com.typesafe.akka" %% "akka-stream-testkit" % akkaVersion,
-      "com.typesafe.akka" %% "akka-http-testkit" % "10.1.9",
+      "com.typesafe.akka" %% "akka-http-testkit" % httpVersion,
       "org.scalamock" %% "scalamock" % "4.4.0"
     ) map (_ % Test)
 
@@ -60,7 +61,7 @@ object Dependencies {
     )
 
     lazy val httpDeps = Seq(
-      "com.typesafe.akka" %% "akka-http" % "10.1.9",
+      "com.typesafe.akka" %% "akka-http" % httpVersion,
       "de.heikoseeberger" %% "akka-http-json4s" % "1.22.0"
     )
 

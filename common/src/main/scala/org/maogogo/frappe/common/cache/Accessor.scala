@@ -42,14 +42,13 @@ final class ByteStringSerializer extends KeySerializer[String, ByteString] {
 }
 
 final class ProtoBufByteStringSerializer[T <: ProtoBuf[T]]
-    extends KeySerializer[T, ByteString] {
+  extends KeySerializer[T, ByteString] {
   override def serialize(k: T): ByteString = ByteString.fromArray(k.toByteArray)
 }
 
 final class ProtoBufByteStringDeserializer[T <: ProtoBuf[T]](
   implicit
-  c: scalapb.GeneratedMessageCompanion[T]
-) extends ValueSerializer[T, ByteString] {
+  c: scalapb.GeneratedMessageCompanion[T]) extends ValueSerializer[T, ByteString] {
 
   override def serialize(v: T): ByteString = ByteString.fromArray(v.toByteArray)
 

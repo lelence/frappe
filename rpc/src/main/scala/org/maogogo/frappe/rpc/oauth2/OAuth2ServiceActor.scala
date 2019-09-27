@@ -21,6 +21,5 @@ import akka.actor.Actor
 class OAuth2ServiceActor extends Actor {
   override def receive: Receive = {
     case s: String ⇒
-
   }
 }

@@ -16,9 +16,10 @@
 
 package org.maogogo.frappe.common.modules
 
-import akka.actor.ActorSystem
+import akka.actor.{ ActorRef, ActorSystem }
 import akka.cluster.Cluster
-import com.google.inject.{AbstractModule, Inject, Provider}
+import com.google.inject.name.Named
+import com.google.inject.{ AbstractModule, Inject, Provider }
 import net.codingwell.scalaguice.ScalaModule
 import org.maogogo.frappe.common.cluster.SimpleClusterListener
 
@@ -31,15 +32,32 @@ sealed trait SingletonClusterModule {
           .toProvider[SingletonClusterModule.ClusterProvider]
           .asEagerSingleton()
         bind[SimpleClusterListener]
+
+        bind[SingletonProxyLookup]
+
+        install(SingletonClusterProxyModule())
+
+        // bind[A].toProvider[TypeProvider[B]]
       }
     }
 }
 
 object SingletonClusterModule extends SingletonClusterModule {
 
-  class ClusterProvider @Inject()(system: ActorSystem)
-      extends Provider[Cluster] {
+  class ClusterProvider @Inject() (system: ActorSystem)
+    extends Provider[Cluster] {
     override def get(): Cluster = Cluster(system)
   }
 
+}
+
+class SingletonProxyLookup @Inject() (
+  @Named("ActorRefMap") actorRefs: Map[String, ActorRef]) {
+
+  def get(name: String): ActorRef = {
+    actorRefs.find(_._1 == name) match {
+      case Some((_, actorRef: ActorRef)) ⇒ actorRef
+      case _ ⇒ throw new Exception("no actorref")
+    }
+  }
 }

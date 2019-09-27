@@ -20,23 +20,26 @@ import java.util.Date
 
 package object oauth2 {
 
-  final case class AuthInfo[U](user: U,
-                               clientId: String,
-                               scope: Option[String],
-                               redirectUri: Option[String])
+  final case class AuthInfo[U](
+    user: U,
+    clientId: String,
+    scope: Option[String],
+    redirectUri: Option[String])
 
-  final case class AccessToken(token: String,
-                               refreshToken: Option[String],
-                               scope: Option[String],
-                               expiresIn: Option[Long],
-                               createdAt: Date)
+  final case class AccessToken(
+    token: String,
+    refreshToken: Option[String],
+    scope: Option[String],
+    expiresIn: Option[Long],
+    createdAt: Date)
 
   final case class ClientCredential(clientId: String, clientSecret: String)
 
-  final case class GrantResult(tokenType: String,
-                               accessToken: String,
-                               expiresIn: Option[Long],
-                               refreshToken: Option[String],
-                               scope: Option[String])
+  final case class GrantResult(
+    tokenType: String,
+    accessToken: String,
+    expiresIn: Option[Long],
+    refreshToken: Option[String],
+    scope: Option[String])
 
 }

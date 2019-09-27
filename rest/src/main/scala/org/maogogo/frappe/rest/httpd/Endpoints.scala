@@ -14,20 +14,12 @@
  * limitations under the License.
  */
 
-package org.maogogo.frappe.common.cache
+package org.maogogo.frappe.rest.httpd
 
-import akka.util.ByteString
-import org.maogogo.frappe.common.ProtoBuf
+import akka.http.scaladsl.server.Route
 
-class ProtoBufCacheAccesser[T <: ProtoBuf[T]](
-  implicit
-  val accessor: ReidsByteStringAccessor,
-  c: scalapb.GeneratedMessageCompanion[T]) extends Cacher[String, String, T, ByteString] {
+trait Endpoints extends Json4sSupport {
 
-  override val keySerializer: KeySerializer[String, String] =
-    new StringSerializer
-
-  override val valueSerializer: ValueSerializer[T, ByteString] =
-    new ProtoBufByteStringDeserializer[T]
+  def apply(): Route
 
 }

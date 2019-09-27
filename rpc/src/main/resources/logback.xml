@@ -59,6 +59,7 @@
     <!-- <logger name="com.twitter" level="ERROR" additivity="true" /> -->
 
     <logger name="io.netty" level="ERROR" additivity="true"/>
+    <logger name="com.zaxxer.hikari" level="ERROR" additivity="true"/>
     <logger name="com.corundumstudio.socketio" level="ERROR" additivity="true"/>
 
     <!-- Root Logger -->

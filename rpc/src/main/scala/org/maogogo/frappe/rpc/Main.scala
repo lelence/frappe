@@ -16,8 +16,13 @@
 
 package org.maogogo.frappe.rpc
 
+import akka.actor.ActorRef
+import com.google.inject.name.Names
 import com.typesafe.config.ConfigFactory
+import org.maogogo.frappe.common.modules.SysAndConfigModule
 import org.maogogo.frappe.common.{ AppSetting, GuiceAkka }
+import org.maogogo.frappe.protobuf.data.Hello
+import org.maogogo.frappe.rpc.actors.HelloActor
 
 object Main extends App {
 
@@ -40,24 +45,26 @@ object Main extends App {
 
   }.parse(args, AppSetting()) match {
     case Some(settings) ⇒
-      //      val seeds = settings.seeds
-      //        .map(s ⇒ s""""akka.tcp://${SysAndConfigModule.SystemName}@${s.trim}"""")
-      //        .mkString(",")
+      val seeds = settings.seeds
+        .map(
+          s ⇒ s""""akka.tcp://${SysAndConfigModule.AkkaSystemName}@${s.trim}"""")
+        .mkString(",")
 
-      //      val config = ConfigFactory
-      //        .parseString(s"""
-      //             |akka.remote.netty.tcp.port=${settings.port}
-      //             |akka.remote.netty.tcp.hostname="127.0.0.1"
-      //             |akka.cluster.seed-nodes=[${seeds}]
-      //        """.stripMargin)
-      //        .withFallback(ConfigFactory.load())
+      val config = ConfigFactory
+        .parseString(s"""
+             |akka.remote.netty.tcp.port=2555
+             |akka.remote.netty.tcp.hostname="0.0.0.0"
+             |akka.cluster.seed-nodes=["akka.tcp://MyClusterSystem@0.0.0.0:2555","akka.tcp://MyClusterSystem@0.0.0.0:2555"]
+              """.stripMargin)
+        .withFallback(ConfigFactory.load())
 
-      val injector =
-        GuiceAkka().cluster(ConfigFactory.load(), ServiceModel).build()
+      //      val injector =
+      GuiceAkka().cluster(config, ServiceModel).build()
       //
-      //      import net.codingwell.scalaguice.InjectorExtensions._
+      import net.codingwell.scalaguice.InjectorExtensions._
+
       //
-      //      injector.instance[ActorRef](Names.named("hello_actor"))
+      // injector.instance[ActorRef](Names.named(HelloActor.ActorName))
 
       println(logo)
 

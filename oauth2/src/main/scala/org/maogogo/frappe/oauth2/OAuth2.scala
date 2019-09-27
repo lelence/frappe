@@ -21,25 +21,23 @@ import akka.http.scaladsl.server.directives.Credentials
 trait OAuth2 {
 
   def basicAuthAuthenticator[U](
-    credentials: Credentials
-  )(implicit dataHandler: DataHandler[U]): Option[U] =
+    credentials: Credentials)(implicit dataHandler: DataHandler[U]): Option[U] =
     credentials match {
       case p @ Credentials.Provided(_) =>
 
-        dataHandler.findUser("", "")
+        val dd = dataHandler.findUser("", "")
 
+        //        dataHandler.findUser()
 
-//        dataHandler.findUser()
+        //        println("====>>>>>>>>>>>" + p.identifier)
+        //
+        //        p.verify("112", s ⇒ {
+        //
+        //          println("ssss =>>>" + s)
+        //          s
+        //        })
 
-//        println("====>>>>>>>>>>>" + p.identifier)
-//
-//        p.verify("112", s ⇒ {
-//
-//          println("ssss =>>>" + s)
-//          s
-//        })
-
-//        println("===>>>" + p.verify("111"))
+        //        println("===>>>" + p.verify("111"))
 
         //        validBasicAuthCredentials.find(
         //          user => user.username == p.identifier && p.verify(user.password)
@@ -50,8 +48,7 @@ trait OAuth2 {
     }
 
   def oAuthAuthenticator[U](
-    credentials: Credentials
-  )(implicit dataHandler: DataHandler[U]): Option[U] =
+    credentials: Credentials)(implicit dataHandler: DataHandler[U]): Option[U] =
     credentials match {
       case p @ Credentials.Provided(_) =>
         // loggedInUsers.find(user => p.verify(user.oAuthToken.access_token))

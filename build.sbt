@@ -25,7 +25,10 @@ lazy val rest = (project in file("rest"))
 lazy val rpc = (project in file("rpc"))
   .enablePlugins(AutomateHeaderPlugin)
   .dependsOn(common)
-  .settings(basicSetting, libraryDependencies ++= rpcDeps)
+  .settings(basicSetting,
+    libraryDependencies ++= rpcDeps
+    // libraryDependencies += "com.github.tototoshi" %% "scala-csv" % "1.3.6"
+)
 
 lazy val proto = (project in file("proto"))
   .settings(

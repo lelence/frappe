@@ -5,3 +5,7 @@ option java_package = "org.maogogo.frappe.protobuf";
 package com.maogogo.cocoa.protobuf;
 
 import "google/protobuf/wrappers.proto";
+
+message Hello {
+    string name = 1;
+}

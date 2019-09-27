@@ -14,20 +14,8 @@
  * limitations under the License.
  */
 
-package org.maogogo.frappe.common.cache
+package org.maogogo.frappe.rpc.services
 
-import akka.util.ByteString
-import org.maogogo.frappe.common.ProtoBuf
-
-class ProtoBufCacheAccesser[T <: ProtoBuf[T]](
-  implicit
-  val accessor: ReidsByteStringAccessor,
-  c: scalapb.GeneratedMessageCompanion[T]) extends Cacher[String, String, T, ByteString] {
-
-  override val keySerializer: KeySerializer[String, String] =
-    new StringSerializer
-
-  override val valueSerializer: ValueSerializer[T, ByteString] =
-    new ProtoBufByteStringDeserializer[T]
+class HelloService {
 
 }

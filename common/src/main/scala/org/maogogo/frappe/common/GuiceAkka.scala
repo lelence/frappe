@@ -16,8 +16,10 @@
 
 package org.maogogo.frappe.common
 
-import com.google.inject.{Guice, Injector, Module}
-import com.typesafe.config.{Config, ConfigFactory}
+import akka.actor.ActorRef
+import com.google.inject.name.Names
+import com.google.inject._
+import com.typesafe.config.{ Config, ConfigFactory }
 import org.maogogo.frappe.common.modules.{
   SingletonClusterModule,
   SysAndConfigModule
@@ -26,6 +28,12 @@ import org.maogogo.frappe.common.modules.{
 final object GuiceAkka {
 
   def apply(): GuiceAkka = new GuiceAkka(ConfigFactory.load(), Seq.empty)
+
+  implicit class ActorInjector(injector: Injector) {
+    def getActorRef(name: String): ActorRef = {
+      injector.getInstance(Key.get(classOf[ActorRef], Names.named(name)))
+    }
+  }
 
 }
 
@@ -51,6 +59,8 @@ private[common] class GuiceAkka(config: Config, modules: Seq[Module]) {
     new GuiceAkka(cfg, modules ++ m :+ SingletonClusterModule())
 
   def build(): Injector =
-    Guice.createInjector(modules :+ SysAndConfigModule(config): _*)
+    Guice.createInjector(
+      Stage.PRODUCTION,
+      modules :+ SysAndConfigModule(config): _*)
 
 }

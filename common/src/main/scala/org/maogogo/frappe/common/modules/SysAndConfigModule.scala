@@ -18,9 +18,11 @@ package org.maogogo.frappe.common.modules
 
 import akka.actor.ActorSystem
 import akka.stream.ActorMaterializer
-import com.google.inject.{AbstractModule, Inject, Provider}
+import akka.util.Timeout
+import com.google.inject.{ AbstractModule, Inject, Provider }
 import com.typesafe.config.Config
 import net.codingwell.scalaguice.ScalaModule
+import scala.concurrent.duration._
 
 sealed trait SysAndConfigModule {
 
@@ -34,10 +36,16 @@ sealed trait SysAndConfigModule {
         bind[ActorSystem].toInstance(system)
         bind[Config].toInstance(config)
 
-        // bind[ActorBuilder].annotatedWithName("actor_builder").to[ActorBuilderImpl]
         bind[ActorMaterializer]
           .toProvider[ActorMaterializerProvider]
           .asEagerSingleton()
+
+        val timeout = config.hasPath("akka.timeout") match {
+          case true ⇒ config.getInt("akka.timeout")
+          case _ ⇒ 5
+        }
+
+        bind[Timeout].toInstance(new Timeout(timeout seconds))
       }
     }
 }
@@ -46,8 +54,8 @@ object SysAndConfigModule extends SysAndConfigModule {
 
   lazy val AkkaSystemName = "MyClusterSystem"
 
-  class ActorMaterializerProvider @Inject()(system: ActorSystem)
-      extends Provider[ActorMaterializer] {
+  class ActorMaterializerProvider @Inject() (system: ActorSystem)
+    extends Provider[ActorMaterializer] {
     override def get(): ActorMaterializer = ActorMaterializer()(system)
   }
 

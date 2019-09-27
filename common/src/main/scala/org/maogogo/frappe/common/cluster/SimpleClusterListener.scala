@@ -16,19 +16,13 @@
 
 package org.maogogo.frappe.common.cluster
 
-import akka.actor.{Actor, ActorSystem}
+import akka.actor.Actor
 import akka.cluster.Cluster
-import akka.cluster.ClusterEvent.{
-  InitialStateAsEvents,
-  MemberEvent,
-  MemberRemoved,
-  MemberUp,
-  UnreachableMember
-}
+import akka.cluster.ClusterEvent._
 import akka.event.Logging
 import com.google.inject.Inject
 
-class SimpleClusterListener @Inject()(cluster: Cluster) extends Actor {
+class SimpleClusterListener @Inject() (cluster: Cluster) extends Actor {
 
   private lazy val logger = Logging(context.system, this)
 
@@ -37,8 +31,7 @@ class SimpleClusterListener @Inject()(cluster: Cluster) extends Actor {
       self,
       initialStateMode = InitialStateAsEvents,
       classOf[MemberEvent],
-      classOf[UnreachableMember]
-    )
+      classOf[UnreachableMember])
   }
 
   override def postStop(): Unit = cluster.unsubscribe(self)
@@ -52,8 +45,7 @@ class SimpleClusterListener @Inject()(cluster: Cluster) extends Actor {
       logger.info(
         "Member is Removed: {} after {}",
         member.address,
-        previousStatus
-      )
+        previousStatus)
     case _: MemberEvent ⇒ // ignore
   }
 

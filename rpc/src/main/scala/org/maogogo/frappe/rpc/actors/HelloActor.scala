@@ -14,14 +14,21 @@
  * limitations under the License.
  */
 
-package org.maogogo.frappe.rpc
+package org.maogogo.frappe.rpc.actors
 
 import akka.actor.Actor
+import org.maogogo.frappe.protobuf.data.Hello
+import org.maogogo.frappe.rpc.services.HelloService
 
-class HelloActor extends Actor {
+class HelloActor(service: HelloService) extends Actor {
+
   override def receive: Receive = {
-    case s: String ⇒
-      println("sss ==>>>" + s)
+    case hello: Hello ⇒
+      println("sss ==>>>" + hello.name)
       sender() ! "hahahahah"
   }
+}
+
+object HelloActor {
+  final val ActorName = "hello"
 }

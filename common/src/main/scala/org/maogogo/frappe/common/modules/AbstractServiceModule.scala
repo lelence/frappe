@@ -16,20 +16,26 @@
 
 package org.maogogo.frappe.common.modules
 
-import akka.util.Timeout
+import akka.actor.{ ActorRef, ActorSystem, PoisonPill, Props }
+import akka.cluster.singleton.{
+  ClusterSingletonManager,
+  ClusterSingletonManagerSettings
+}
 import com.google.inject.AbstractModule
 import net.codingwell.scalaguice.ScalaModule
 
-import scala.concurrent.duration._
+trait AbstractServiceModule extends AbstractModule with ScalaModule {
 
-trait TimeoutModule {
+  def provideActorRef(
+    props: Props,
+    name: String)(implicit system: ActorSystem): ActorRef = {
+    system.actorOf(
+      ClusterSingletonManager.props(
+        singletonProps = props,
+        terminationMessage = PoisonPill,
+        settings = ClusterSingletonManagerSettings(system) // .withRole("worker")
+      ),
+      name = name)
+  }
 
-  def apply(seconds: Int = 5): AbstractModule with ScalaModule =
-    new AbstractModule with ScalaModule {
-      override def configure(): Unit = {
-        bind[Timeout].toInstance(new Timeout(5 seconds))
-      }
-    }
 }
-
-object TimeoutModule extends TimeoutModule

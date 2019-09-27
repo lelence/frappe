@@ -16,17 +16,30 @@
 
 package org.maogogo.frappe.rpc
 
-import com.google.inject.AbstractModule
-import net.codingwell.scalaguice.ScalaModule
-import org.maogogo.frappe.common.modules.DatabaseModule
+import akka.actor.{ ActorRef, ActorSystem, Props }
+import com.google.inject.name.Named
+import com.google.inject.{ Inject, Provides, Singleton }
+import org.maogogo.frappe.common.modules.{ AbstractServiceModule, DatabaseModule }
+import org.maogogo.frappe.rpc.actors.HelloActor
+import org.maogogo.frappe.rpc.services.HelloService
 
-class ServiceModel extends AbstractModule with ScalaModule {
+class ServiceModel extends AbstractServiceModule {
 
   override def configure(): Unit = {
 
-    install(DatabaseModule())
+    bind[HelloService]
 
+    install(DatabaseModule())
   }
+
+  @Provides
+  @Singleton
+  @Named(HelloActor.ActorName)
+  def provideHelloActor(
+    @Inject() service: HelloService)(implicit system: ActorSystem): ActorRef =
+    provideActorRef(
+      Props(classOf[HelloActor], service),
+      s"actor_${HelloActor.ActorName}")
 
 }
 

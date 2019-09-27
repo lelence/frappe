@@ -16,29 +16,53 @@
 
 package org.maogogo.frappe.rest
 
-import com.google.inject.AbstractModule
-import net.codingwell.scalaguice.ScalaModule
-import org.maogogo.frappe.rest.httpd.{HttpServer, RouteEndpoints}
+import akka.actor.{ ActorRef, ActorSystem }
+import akka.cluster.singleton.{
+  ClusterSingletonProxy,
+  ClusterSingletonProxySettings
+}
+import com.google.inject.name.{ Named, Names }
+import com.google.inject.{ AbstractModule, Provides, Singleton }
+import net.codingwell.scalaguice.{ ScalaMapBinder, ScalaModule }
+import org.maogogo.frappe.common.modules.AbstractServiceModule
+import org.maogogo.frappe.rest.endpoints.HelloEndpoint
+import org.maogogo.frappe.rest.httpd.{ Endpoints, HttpServer, RouteEndpoints }
 
-class ServiceModel extends AbstractModule with ScalaModule {
+class ServiceModel extends AbstractServiceModule {
 
   override def configure(): Unit = {
 
-    //    val mBinder = ScalaMapBinder.newMapBinder[String, Endpoints](binder(), Names.named("endpoints"))
-    //    mBinder.addBinding("hello").to[HelloEndpoint]
+    val mBinder = ScalaMapBinder
+      .newMapBinder[String, Endpoints](binder(), Names.named("endpoints"))
+    mBinder.addBinding("hello").to[HelloEndpoint]
 
     bind[RouteEndpoints]
     bind[HttpServer]
-    //
-    //    install(TimeoutModule())
 
   }
+
+  //  def provideActorRefProxy(
+  //    path: String)(implicit system: ActorSystem): ActorRef = {
+  //    system.actorOf(
+  //      ClusterSingletonProxy.props(
+  //        singletonManagerPath = s"/user/actor_${path}",
+  //        settings = ClusterSingletonProxySettings(system)),
+  //      name = s"proxy_${path}")
+  //  }
 
   //  @Provides
   //  @Singleton
   //  @Named("hello_actor")
-  //  def provideHelloProxy(implicit system: ActorSystem): ActorRef = {
-  //    provideProxy("hello_actor")
+  //  def provideHelloProxy(system: ActorSystem): ActorRef = {
+  //    // provideProxy("hello_actor")
+  //
+  //    system.actorOf(
+  //      ClusterSingletonProxy.props(
+  //        singletonManagerPath = "/user/hello",
+  //        settings = ClusterSingletonProxySettings(system) // .withRole("worker")
+  //      ),
+  //      name = "consumerProxy")
+  //
   //  }
 
 }

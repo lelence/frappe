@@ -16,17 +16,62 @@
 
 package org.maogogo.frappe.rest
 
+import java.util
+
 import akka.http.scaladsl.Http
-import org.maogogo.frappe.common.GuiceAkka
+import com.typesafe.config.{ ConfigFactory, ConfigList }
+import org.maogogo.frappe.common.modules.SysAndConfigModule
+import org.maogogo.frappe.common.{ AppSetting, GuiceAkka }
 import org.maogogo.frappe.rest.httpd.HttpServer
 
 object Main extends App {
 
-  val injector = GuiceAkka().system(ServiceModel).build()
-  //
-  import net.codingwell.scalaguice.InjectorExtensions._
-  //
-  injector.instance[HttpServer]
+  new scopt.OptionParser[AppSetting]("scopt") {
+    head("latte", "1.0")
+
+    opt[Int]('p', "port")
+      .action((x, c) ⇒ {
+        c.copy(port = x)
+      })
+      .text("tcp port")
+
+    opt[Seq[String]]('s', "seeds")
+      .action((x, c) ⇒ {
+        c.copy(seeds = x)
+      })
+      .text("cluster seeds")
+
+  }.parse(args, AppSetting()) match {
+    case Some(settings) ⇒
+      val seeds = settings.seeds
+        .map(
+          s ⇒ s""""akka.tcp://${SysAndConfigModule.AkkaSystemName}@${s.trim}"""")
+        .mkString(",")
+
+      val config = ConfigFactory
+        .parseString(s"""
+                        |akka.remote.netty.tcp.port=2558
+                        |akka.remote.netty.tcp.hostname="0.0.0.0"
+                        |akka.cluster.seed-nodes=["akka.tcp://MyClusterSystem@0.0.0.0:2555"]
+              """.stripMargin)
+        .withFallback(ConfigFactory.load())
+
+      import scala.collection.JavaConverters._
+
+      //      config.getStringList("akka.cluster.proxies")
+
+      //      println(dd)
+
+      val injector =
+        GuiceAkka().cluster(config, ServiceModel).build()
+      import net.codingwell.scalaguice.InjectorExtensions._
+
+      injector.instance[HttpServer]
+
+      println(logo)
+
+    case _ ⇒
+  }
 
   // val bindingFuture = Http().bindAndHandle(null, "localhost", 8080)
   //
@@ -34,4 +79,13 @@ object Main extends App {
   //  bindingFuture
   //    .flatMap(_.unbind()) // trigger unbinding from the port
   //    .onComplete(_ => system.terminate())
+
+  lazy val logo =
+    """
+      |    ____            __
+      |   / __ \___  _____/ /_
+      |  / /_/ / _ \/ ___/ __/
+      | / _, _/  __(__  ) /_
+      |/_/ |_|\___/____/\__/ 
+      |""".stripMargin
 }

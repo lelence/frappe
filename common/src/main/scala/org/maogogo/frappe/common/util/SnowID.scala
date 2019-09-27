@@ -1,3 +1,19 @@
+/*
+ * Copyright 2019 Maogogo Workshop
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 package org.maogogo.frappe.common.util
 
 class SnowID(datacenterId: Long = 1L, workerId: Long = 1L) {
@@ -22,14 +38,12 @@ class SnowID(datacenterId: Long = 1L, workerId: Long = 1L) {
 
   if (workerId > maxWorkerId || workerId < 0)
     throw new IllegalArgumentException(
-      "worker Id can't be greater than %d or less than 0".format(maxWorkerId)
-    )
+      "worker Id can't be greater than %d or less than 0".format(maxWorkerId))
 
   if (datacenterId > maxDatacenterId || datacenterId < 0)
     throw new IllegalArgumentException(
       "datacenter Id can't be greater than %d or less than 0"
-        .format(maxDatacenterId)
-    )
+        .format(maxDatacenterId))
 
   def next(): Long = synchronized {
 
@@ -38,8 +52,7 @@ class SnowID(datacenterId: Long = 1L, workerId: Long = 1L) {
     if (timestamp < lastTimestamp) {
       throw new IllegalStateException(
         "Clock moved backwards. Refusing to generate id for %d milliseconds"
-          .format(lastTimestamp - timestamp)
-      )
+          .format(lastTimestamp - timestamp))
     }
 
     if (lastTimestamp == timestamp) {
@@ -64,7 +77,7 @@ class SnowID(datacenterId: Long = 1L, workerId: Long = 1L) {
     val timestamp = timeGen()
     (timestamp <= lastTimestamp) match {
       case true => tilNextMillis(lastTimestamp)
-      case _    => timestamp
+      case _ => timestamp
     }
   }
 

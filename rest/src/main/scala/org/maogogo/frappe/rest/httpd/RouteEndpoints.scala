@@ -16,33 +16,24 @@
 
 package org.maogogo.frappe.rest.httpd
 
-import akka.actor.{ActorRef, ActorSystem}
+import akka.actor.ActorSystem
 import akka.event.Logging
-import akka.http.scaladsl.model.{
-  HttpEntity,
-  HttpRequest,
-  HttpResponse,
-  RequestEntity,
-  ResponseEntity
-}
 import akka.http.scaladsl.server.Directives._
 import akka.http.scaladsl.server.Route
-import akka.stream.scaladsl.{Flow, Sink, Source}
-import akka.util.{ByteString, Timeout}
+import akka.util.Timeout
 import com.google.inject.Inject
-import akka.pattern.{ask, pipe}
+import com.google.inject.name.Named
 import org.maogogo.frappe.oauth2.OAuth2
 import org.maogogo.frappe.protobuf.oauth2.UserInfo
 import org.maogogo.frappe.rest.oauth2.OAuth2DataHandler
 
 import scala.concurrent.duration._
-import scala.reflect.ClassTag
 
-class RouteEndpoints @Inject()(implicit system: ActorSystem)
-    extends Json4sSupport
-    with OAuth2 {
-
-  import system.dispatcher
+class RouteEndpoints @Inject() (
+  implicit
+  system: ActorSystem,
+  @Named("endpoints") endpointMap: Map[String, Endpoints]) extends Json4sSupport
+  with OAuth2 {
 
   implicit val timeout = Timeout(5 seconds)
 
@@ -59,6 +50,19 @@ class RouteEndpoints @Inject()(implicit system: ActorSystem)
 
   def apply(): Route = {
 
+    endpointMap.foldLeft(rootEndpoints) { (root, endpoint) ⇒
+      root ~ {
+        val (path, route) = endpoint
+        pathPrefix("v1" / path) {
+          route()
+        }
+      }
+    }
+
+  }
+
+  private val rootEndpoints: Route = {
+
     // https://www.jannikarndt.de/blog/2018/10/oauth2-akka-http/
     // handleRejections()
 
@@ -68,6 +72,8 @@ class RouteEndpoints @Inject()(implicit system: ActorSystem)
       get {
         complete(Seq("aa", "bb"))
       }
+    } ~ path("v1") {
+      complete(Seq("aa", "bb"))
     } ~ path("auth") {
       authenticateBasic(realm = "auth", basicAuthAuthenticator[UserInfo]) {
         user =>

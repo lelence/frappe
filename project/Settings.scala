@@ -17,7 +17,11 @@ object Settings {
     startYear := Some(2019),
     licenses += ("Apache-2.0", new URL(
       "https://www.apache.org/licenses/LICENSE-2.0.txt"
-    ))
+    )),
+    resolvers ++= Seq(
+      "Maven Nexus" at "http://192.168.0.201:8081/repository/maven-public/",
+      "releases" at "http://oss.sonatype.org/content/repositories/releases"
+    )
   )
 
 //  scalacOptions ++= Seq(

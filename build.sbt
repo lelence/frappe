@@ -23,12 +23,16 @@ lazy val rest = (project in file("rest"))
   .settings(basicSetting, libraryDependencies ++= restDeps)
 
 lazy val rpc = (project in file("rpc"))
-  .enablePlugins(JavaAppPackaging, AutomateHeaderPlugin, DockerSpotifyClientPlugin)
+  .enablePlugins(
+    JavaAppPackaging,
+    AutomateHeaderPlugin,
+    DockerSpotifyClientPlugin
+  )
   .dependsOn(common)
   .settings(
     basicSetting,
-    mappingSettings,
     dockerSettings,
+    mappingSettings,
     libraryDependencies ++= rpcDeps
     // libraryDependencies += "com.github.tototoshi" %% "scala-csv" % "1.3.6"
   )

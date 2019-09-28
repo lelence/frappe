@@ -43,7 +43,7 @@ object Settings {
       """addJava "-Dconfig.file=${app_home}/../conf/application.conf"""",
       """addJava "-Dlogback.configurationFile=${app_home}/../conf/logback.xml""""
     ),
-    mappings in (Universal, packageBin) ++= Seq(
+    mappings in Universal ++= Seq(
       // file("src/main/resources/logback.xml")
       (resourceDirectory in Compile).value / "logback.xml" -> "conf/logback.xml",
       (resourceDirectory in Compile).value / "application.conf" -> "conf/application.conf"
@@ -53,6 +53,7 @@ object Settings {
 
   lazy val dockerSettings: Seq[Setting[_]] = Seq(
     maintainer in Docker := "Toan <toan@maogogo.com>",
+    // mappings in Docker := mappings.value,
     dockerBaseImage := "node201:5000/dev/jdk8-stretch",
     dockerRepository := Some("node201:5000/dev"),
     daemonUserUid in Docker := None,

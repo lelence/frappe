@@ -11,7 +11,7 @@ import '@/icons';
 // https://github.com/varHarrie/varharrie.github.io/issues/10
 Vue.config.productionTip = false;
 Vue.use(ElementUI);
-
+// https://github.com/vuejs/vue-docs-zh-cn/blob/master/vue-cli-plugin-babel/README.md
 new Vue({
   router,
   render: h => h(App),

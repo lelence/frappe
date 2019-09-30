@@ -43,18 +43,33 @@ object Main extends App {
 
   }.parse(args, AppSetting()) match {
     case Some(settings) ⇒
+      val appCfg = ConfigFactory.load()
+
+      val appPort = appCfg.hasPath("akka.remote.netty.tcp.port") match {
+        case true =>
+          val port = appCfg.getInt("akka.remote.netty.tcp.port")
+
+          port match {
+            case 0 => settings.port
+            case _ => port
+          }
+        case _ => settings.port
+      }
+
       val seeds = settings.seeds
-        .map(
-          s ⇒ s""""akka.tcp://${SysAndConfigModule.AkkaSystemName}@${s.trim}"""")
+        .map { s ⇒
+          val seed = if (s.startsWith(":")) s"0.0.0.0${s.trim}" else s.trim
+          s""""akka.tcp://${SysAndConfigModule.AkkaSystemName}@${seed}""""
+        }
         .mkString(",")
 
       val config = ConfigFactory
         .parseString(s"""
-                        |akka.remote.netty.tcp.port=2558
-                        |akka.remote.netty.tcp.hostname="0.0.0.0"
-                        |akka.cluster.seed-nodes=["akka.tcp://MyClusterSystem@0.0.0.0:2555"]
-              """.stripMargin)
-        .withFallback(ConfigFactory.load())
+           |akka.remote.netty.tcp.port=${appPort}
+           |akka.remote.netty.tcp.hostname="0.0.0.0"
+           |akka.cluster.seed-nodes=[${seeds}]
+            """.stripMargin)
+        .withFallback(appCfg)
 
       import scala.collection.JavaConverters._
 

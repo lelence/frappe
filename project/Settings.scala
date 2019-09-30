@@ -6,11 +6,11 @@ import sbt._
 
 object Settings {
 
-  lazy val basicSetting = Seq(
+  lazy val basicSetting: Seq[Setting[_]] = Seq(
     organization := "org.maogogo",
     maintainer := "toan@maogogo.org",
     version := sys.env.getOrElse("version", "0.0.1-SNAPSHOT"),
-    scalaVersion := "2.12.7",
+    scalaVersion := "2.12.10",
     organizationName := "Maogogo Workshop",
     scalacOptions := Seq(
       "-deprecation",
@@ -23,8 +23,8 @@ object Settings {
       "https://www.apache.org/licenses/LICENSE-2.0.txt"
     )),
     resolvers ++= Seq(
-      "Maven Nexus" at "http://192.168.0.201:8081/repository/maven-public/",
-      "releases" at "http://oss.sonatype.org/content/repositories/releases"
+      // "Maven Nexus" at "http://192.168.0.201:8081/repository/maven-public/",
+      // "releases" at "http://oss.sonatype.org/content/repositories/releases"
     )
   )
 
@@ -62,7 +62,7 @@ object Settings {
   )
 
   // for publish
-  val publishSettings = Seq(
+  val publishSettings: Seq[Setting[_]] = Seq(
     publishArtifact in (Compile, packageSrc) := false,
     publishArtifact in (Compile, packageDoc) := false,
     publishTo := {

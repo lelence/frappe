@@ -26,8 +26,6 @@ import org.maogogo.frappe.rpc.actors.HelloActor
 
 object Main extends App {
 
-  //  import org.maogogo.frappe.co
-
   new scopt.OptionParser[AppSetting]("scopt") {
     head("latte", "1.0")
 
@@ -45,27 +43,20 @@ object Main extends App {
 
   }.parse(args, AppSetting()) match {
     case Some(settings) ⇒
-      val appCfg = ConfigFactory.load()
+      val appConfig = ConfigFactory.load()
 
-      val appPort = appCfg.hasPath("akka.remote.netty.tcp.port") match {
-        case true =>
-          val port = appCfg.getInt("akka.remote.netty.tcp.port")
-
-          port match {
-            case 0 => settings.port
-            case _ => port
-          }
-        case _ => settings.port
+      val appPort = {
+        if (settings.port == 0) {
+          if (appConfig.hasPath("akka.remote.netty.tcp.port"))
+            appConfig.getInt("akka.remote.netty.tcp.port")
+          else 2552
+        } else settings.port
       }
 
-      val localSeed =
-        s""""akka.tcp://${SysAndConfigModule.AkkaSystemName}@0.0.0.0:${appPort}""""
-
-      val seeds = settings.seeds
-        .map { s ⇒
-          val seed = if (s.startsWith(":")) s"0.0.0.0${s.trim}" else s.trim
-          s""""akka.tcp://${SysAndConfigModule.AkkaSystemName}@${s.trim}""""
-        } :+ localSeed mkString (",")
+      val seeds = (settings.seeds :+ localSeed(appPort)).map { s =>
+        val seed = if (s.startsWith(":")) s"0.0.0.0${s.trim}" else s.trim
+        s""""akka.tcp://${SysAndConfigModule.AkkaSystemName}@${s.trim}""""
+      } mkString (",")
 
       val config = ConfigFactory
         .parseString(s"""
@@ -73,7 +64,7 @@ object Main extends App {
              |akka.remote.netty.tcp.hostname="0.0.0.0"
              |akka.cluster.seed-nodes=[${seeds}]
               """.stripMargin)
-        .withFallback(appCfg)
+        .withFallback(appConfig)
 
       GuiceAkka().cluster(config, ServiceModel).build()
 
@@ -84,11 +75,13 @@ object Main extends App {
 
   lazy val logo =
     """
-      |    ____
-      |   / __ \____  _____
-      |  / /_/ / __ \/ ___/
-      | / _, _/ /_/ / /__
-      |/_/ |_/ .___/\___/
-      |     /_/
-    """.stripMargin
+    |    ____
+    |   / __ \____  _____
+    |  / /_/ / __ \/ ___/
+    | / _, _/ /_/ / /__
+    |/_/ |_/ .___/\___/
+    |     /_/
+  """.stripMargin
+
+  lazy val localSeed = (port: Int) => s"0.0.0.0:${port}"
 }

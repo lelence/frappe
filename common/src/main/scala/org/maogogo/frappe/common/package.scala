@@ -20,5 +20,6 @@ package object common {
 
   type ProtoBuf[T] = scalapb.GeneratedMessage with scalapb.Message[T]
 
-  case class AppSetting(port: Int = 2552, seeds: Seq[String] = Seq.empty)
+  case class AppSetting(port: Int = 0, seeds: Seq[String] = Seq.empty)
+
 }

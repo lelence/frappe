@@ -43,25 +43,20 @@ object Main extends App {
 
   }.parse(args, AppSetting()) match {
     case Some(settings) ⇒
-      val appCfg = ConfigFactory.load()
+      val appConfig = ConfigFactory.load()
 
-      val appPort = appCfg.hasPath("akka.remote.netty.tcp.port") match {
-        case true =>
-          val port = appCfg.getInt("akka.remote.netty.tcp.port")
-
-          port match {
-            case 0 => settings.port
-            case _ => port
-          }
-        case _ => settings.port
+      val appPort = {
+        if (settings.port == 0) {
+          if (appConfig.hasPath("akka.remote.netty.tcp.port"))
+            appConfig.getInt("akka.remote.netty.tcp.port")
+          else 2552
+        } else settings.port
       }
 
-      val seeds = settings.seeds
-        .map { s ⇒
-          val seed = if (s.startsWith(":")) s"0.0.0.0${s.trim}" else s.trim
-          s""""akka.tcp://${SysAndConfigModule.AkkaSystemName}@${seed}""""
-        }
-        .mkString(",")
+      val seeds = (settings.seeds :+ localSeed(appPort)).map { s =>
+        val seed = if (s.startsWith(":")) s"0.0.0.0${s.trim}" else s.trim
+        s""""akka.tcp://${SysAndConfigModule.AkkaSystemName}@${s.trim}""""
+      } mkString (",")
 
       val config = ConfigFactory
         .parseString(s"""
@@ -69,13 +64,9 @@ object Main extends App {
            |akka.remote.netty.tcp.hostname="0.0.0.0"
            |akka.cluster.seed-nodes=[${seeds}]
             """.stripMargin)
-        .withFallback(appCfg)
+        .withFallback(appConfig)
 
-      import scala.collection.JavaConverters._
-
-      //      config.getStringList("akka.cluster.proxies")
-
-      //      println(dd)
+      GuiceAkka().cluster(config, ServiceModel).build()
 
       val injector =
         GuiceAkka().cluster(config, ServiceModel).build()
@@ -103,4 +94,6 @@ object Main extends App {
       | / _, _/  __(__  ) /_
       |/_/ |_|\___/____/\__/ 
       |""".stripMargin
+
+  lazy val localSeed = (port: Int) => s"0.0.0.0:${port}"
 }

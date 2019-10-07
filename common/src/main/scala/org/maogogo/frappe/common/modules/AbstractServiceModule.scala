@@ -17,10 +17,7 @@
 package org.maogogo.frappe.common.modules
 
 import akka.actor.{ ActorRef, ActorSystem, PoisonPill, Props }
-import akka.cluster.singleton.{
-  ClusterSingletonManager,
-  ClusterSingletonManagerSettings
-}
+import akka.cluster.singleton.{ ClusterSingletonManager, ClusterSingletonManagerSettings }
 import com.google.inject.AbstractModule
 import net.codingwell.scalaguice.ScalaModule
 
@@ -37,5 +34,10 @@ trait AbstractServiceModule extends AbstractModule with ScalaModule {
       ),
       name = name)
   }
+
+  //  def provideEndpointMap[T](): Unit = {
+  //    val mBinder = ScalaMapBinder
+  //      .newMapBinder[String, T](binder(), Names.named("endpoints"))
+  //  }
 
 }

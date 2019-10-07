@@ -70,10 +70,8 @@ class RouteEndpoints @Inject() (
     // https://juejin.im/post/5b8cb6586fb9a01a133685c9
     pathEndOrSingleSlash {
       get {
-        complete(Seq("aa", "bb"))
+        complete("hello world")
       }
-    } ~ path("v1") {
-      complete(Seq("aa", "bb"))
     } ~ path("auth") {
       authenticateBasic(realm = "auth", basicAuthAuthenticator[UserInfo]) {
         user =>

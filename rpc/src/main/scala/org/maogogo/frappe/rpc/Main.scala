@@ -45,26 +45,37 @@ object Main extends App {
 
   }.parse(args, AppSetting()) match {
     case Some(settings) ⇒
+      val appCfg = ConfigFactory.load()
+
+      val appPort = appCfg.hasPath("akka.remote.netty.tcp.port") match {
+        case true =>
+          val port = appCfg.getInt("akka.remote.netty.tcp.port")
+
+          port match {
+            case 0 => settings.port
+            case _ => port
+          }
+        case _ => settings.port
+      }
+
+      val localSeed =
+        s""""akka.tcp://${SysAndConfigModule.AkkaSystemName}@0.0.0.0:${appPort}""""
+
       val seeds = settings.seeds
-        .map(
-          s ⇒ s""""akka.tcp://${SysAndConfigModule.AkkaSystemName}@${s.trim}"""")
-        .mkString(",")
+        .map { s ⇒
+          val seed = if (s.startsWith(":")) s"0.0.0.0${s.trim}" else s.trim
+          s""""akka.tcp://${SysAndConfigModule.AkkaSystemName}@${s.trim}""""
+        } :+ localSeed mkString (",")
 
       val config = ConfigFactory
         .parseString(s"""
-             |akka.remote.netty.tcp.port=2555
+             |akka.remote.netty.tcp.port=${appPort}
              |akka.remote.netty.tcp.hostname="0.0.0.0"
-             |akka.cluster.seed-nodes=["akka.tcp://MyClusterSystem@0.0.0.0:2555","akka.tcp://MyClusterSystem@0.0.0.0:2555"]
+             |akka.cluster.seed-nodes=[${seeds}]
               """.stripMargin)
-        .withFallback(ConfigFactory.load())
+        .withFallback(appCfg)
 
-      //      val injector =
       GuiceAkka().cluster(config, ServiceModel).build()
-      //
-      import net.codingwell.scalaguice.InjectorExtensions._
-
-      //
-      // injector.instance[ActorRef](Names.named(HelloActor.ActorName))
 
       println(logo)
 

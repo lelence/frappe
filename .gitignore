@@ -4,3 +4,4 @@ target
 project/project
 .DS_Store
 logs/
+.metals/
